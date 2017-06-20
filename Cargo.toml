@@ -1,0 +1,8 @@
+[package]
+name = "pcap_test"
+version = "0.1.0"
+authors = ["truffer <Oskar Truffer>"]
+
+[dependencies]
+pcap = "0.5.7"
+time = "0.1"
