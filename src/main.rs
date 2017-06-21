@@ -1,5 +1,6 @@
 extern crate pcap;
 extern crate time;
+extern crate sonos_api;
 
 use pcap::Device;
 use std::thread;
@@ -8,6 +9,8 @@ use std::fmt::LowerHex;
 use std::fmt::Formatter;
 use std::collections::HashMap;
 use std::fmt;
+use sonos_api::SonosApi;
+use sonos_api::SonosRoom;
 
 struct HexSlice<'a>(&'a [u8]);
 
@@ -39,6 +42,7 @@ fn main() {
 
     let mut mac_to_name = HashMap::new();
     let mut last_call : HashMap<String, i64> = HashMap::new();
+    let mut room : SonosRoom = SonosApi::new("http://localhost:5005".to_string()).room("Arbeiterklasse".to_string());
 
     mac_to_name.insert([0x0, 0x28, 0xf8, 0x4c, 0x7b ,0x2e], String::from("Oskar's Thinkpad"));
 
@@ -60,33 +64,34 @@ fn main() {
 
         match mac_to_name.get(source_hwadr) {
             Some(name) => {
-                call(&mut last_call, name);
+                call(&mut last_call, name, &mut room);
             }
             None => {}
         }
 
         match mac_to_name.get(dest_hwadr) {
             Some(name) => {
-                call(&mut last_call, name);
+                call(&mut last_call, name, &mut room);
             }
             None => {}
         }
     }
 }
 
-fn call(last_call : &mut HashMap<String, i64>, caller: &String) {
+fn call(last_call : &mut HashMap<String, i64>, caller: &String, room: &mut SonosRoom) {
     let mut update = false;
 
     match last_call.get(caller) {
         Some(last_send) => {
             if last_send + 10 < time::now().to_timespec().sec {
                 let greeting = format!{"Hello {}", caller};
-                println!{"{}", greeting};
+                room.say(greeting);
                 update = true;
             }
         }
         None => {
-            println!("{} is in the Area!", caller);
+            let greeting = format!{"Hello {}", caller};
+            room.say(greeting);
             update = true;
         }
     }

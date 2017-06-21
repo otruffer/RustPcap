@@ -6,3 +6,11 @@ authors = ["truffer <Oskar Truffer>"]
 [dependencies]
 pcap = "0.5.7"
 time = "0.1"
+hyper = "0.11"
+futures = "0.1.14"
+tokio-core = "0.1.8"
+url = "1.5.0"
+
+[lib]
+name = "sonos_api"
+path = "src/lib.rs"
